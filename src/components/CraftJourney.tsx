@@ -79,7 +79,7 @@ export default function CraftJourney() {
 
       <div
         ref={track}
-        className="mt-12 flex snap-x snap-mandatory gap-[5vw] overflow-x-auto overscroll-x-contain px-[6vw] pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden cursor-grab active:cursor-grabbing"
+        className="mt-12 flex snap-x snap-mandatory gap-[5vw] overflow-x-auto md:mt-0 md:pt-[clamp(72px,11vw,160px)] overscroll-x-contain px-[6vw] pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden cursor-grab active:cursor-grabbing"
         onPointerDown={(e) => { if (e.pointerType === "mouse" && track.current) drag.current = { x: e.clientX, left: track.current.scrollLeft, moved: false }; }}
         onPointerMove={(e) => {
           const d = drag.current, el = track.current;
