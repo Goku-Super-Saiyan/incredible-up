@@ -108,8 +108,11 @@ export default function CraftJourney() {
             <Arch className="mx-auto h-[min(42svh,360px)] w-[min(66vw,290px)] md:h-[min(62svh,560px)] md:w-full md:max-w-[420px]">
               <CraftCanvas art={c.art} seed={c.seed} label={t(`${c.name} from ${c.place}`, `${x.name}, ${x.place}`)} />
             </Arch>
-            <div className="relative min-w-0 select-none">
-              <span className="text-outline pointer-events-none absolute -top-[0.95em] left-0 hidden font-display md:block text-[clamp(64px,10vw,150px)] leading-none opacity-60" aria-hidden="true">{lang === "hi" ? c.name : c.hindi}</span>
+            <div className="@container relative min-w-0 select-none">
+              {/* One line only: long names shrink to fit the column instead of wrapping onto the title. */}
+              {(() => { const word = lang === "hi" ? c.name : c.hindi; return (
+                <span className="text-outline pointer-events-none absolute -top-[0.95em] left-0 hidden whitespace-nowrap font-display md:block leading-none opacity-60" style={{ fontSize: `min(clamp(64px, 10vw, 150px), ${Math.round((/[\u0900-\u097F]/.test(word) ? 250 : 185) / word.length)}cqw)` }} aria-hidden="true">{word}</span>
+              ); })()}
               <p className="relative font-mono text-xs uppercase tracking-[0.25em] text-marigold">{String(i + 1).padStart(2, "0")} / {String(ICONS.length).padStart(2, "0")} · {x.place}</p>
               <h3 className="relative mt-3 font-display text-[clamp(38px,5vw,72px)] leading-none">{x.name}</h3>
               <div className="mt-6 flex items-baseline gap-4 border-t border-white/10 pt-5">
