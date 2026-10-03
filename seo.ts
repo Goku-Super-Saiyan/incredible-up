@@ -83,7 +83,7 @@ export function seo(env: Env): Plugin {
     `<meta name="theme-color" content="#0E0720" />`,
     `<link rel="apple-touch-icon" href="/og/logo-${key}.png" />`,
     `<meta property="og:type" content="website" />`,
-    `<meta property="og:site_name" content="${esc(brand.name)}" />`,
+    `<meta property="og:site_name" content="${esc(name)}" />`,
     `<meta property="og:locale" content="${p.locale}" />`,
     `<meta property="og:url" content="${p.canonical}" />`,
     `<meta property="og:title" content="${esc(p.title)}" />`,
@@ -91,7 +91,7 @@ export function seo(env: Env): Plugin {
     `<meta property="og:image" content="${image}" />`,
     `<meta property="og:image:width" content="1200" />`,
     `<meta property="og:image:height" content="630" />`,
-    `<meta property="og:image:alt" content="${esc(`${brand.name}, handmade crafts of Uttar Pradesh`)}" />`,
+    `<meta property="og:image:alt" content="${esc(`${name}, handmade crafts of Uttar Pradesh`)}" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${esc(p.title)}" />`,
     `<meta name="twitter:description" content="${esc(p.description)}" />`,
@@ -104,12 +104,12 @@ export function seo(env: Env): Plugin {
   // The storefront's own head, in English (/) or Hindi (/hi/).
   const homeHead = (lang: Lang) => {
     const t = TEXT[lang];
-    const shareTitle = lang === "en" && brand.slogan ? `${brand.name} · ${brand.slogan}` : t.title(brand.name);
+    const shareTitle = lang === "en" && brand.slogan ? `${name} · ${brand.slogan}` : t.title(name);
     const alternates = [`<link rel="alternate" hreflang="en-IN" href="${home("en")}" />`, `<link rel="alternate" hreflang="hi-IN" href="${home("hi")}" />`, `<link rel="alternate" hreflang="x-default" href="${home("en")}" />`].join("\n    ");
-    const website = { "@type": "WebSite", "@id": `${url}/#website`, url: `${url}/`, name: brand.name, inLanguage: ["en-IN", "hi-IN"], publisher: { "@id": `${url}/#store` } };
+    const website = { "@type": "WebSite", "@id": `${url}/#website`, url: `${url}/`, name, alternateName: [brand.name].filter((n) => n !== name), inLanguage: ["en-IN", "hi-IN"], publisher: { "@id": `${url}/#store` } };
     return [
-      ...common({ title: t.title(brand.name), description: t.description, canonical: home(lang), locale: lang === "hi" ? "hi_IN" : "en_IN", alternates })
-        .map((tag) => (tag.startsWith("<meta property=\"og:title\"") || tag.startsWith("<meta name=\"twitter:title\"") ? tag.replace(esc(t.title(brand.name)), esc(shareTitle)) : tag)),
+      ...common({ title: t.title(name), description: t.description, canonical: home(lang), locale: lang === "hi" ? "hi_IN" : "en_IN", alternates })
+        .map((tag) => (tag.startsWith("<meta property=\"og:title\"") || tag.startsWith("<meta name=\"twitter:title\"") ? tag.replace(esc(t.title(name)), esc(shareTitle)) : tag)),
       ldJson([store, website]),
     ].join("\n    ");
   };
@@ -121,7 +121,7 @@ export function seo(env: Env): Plugin {
     const byCat = (c: keyof typeof t.cats) => DISTRICTS.filter((d) => d.cat === c).map((d) => `<li>${esc(hi ? d.nameHi : d.name)}: ${esc(hi ? d.productHi : d.product)}</li>`).join("");
     const contact = [email && `<a href="mailto:${esc(email)}">${esc(email)}</a>`, phone && `<a href="tel:${phone}">${esc(phone)}</a>`, esc(address)].filter(Boolean).join(" · ");
     return `<div class="seo-copy">
-      <h1>${esc(brand.name)}${brand.slogan ? `: ${esc(brand.slogan)}` : ""}</h1>
+      <h1>${esc(name)}${brand.slogan ? `: ${esc(brand.slogan)}` : ""}</h1>
       <p lang="hi">${esc(brand.hindi)}</p>
       <p>${esc(hi ? brand.hi.heroLine : brand.heroLine)}</p>
       <h2>${t.crafts}</h2>
@@ -138,7 +138,7 @@ export function seo(env: Env): Plugin {
   const wa = (text: string) => (whatsapp ? `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}` : "/#enquire");
   const guide = (p: { path: string; title: string; description: string; crumb: string; body: string; ask: string }) => {
     const canonical = `${url}${p.path}`;
-    const crumbs = { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: brand.name, item: `${url}/` }, { "@type": "ListItem", position: 2, name: p.crumb, item: canonical }] };
+    const crumbs = { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: name, item: `${url}/` }, { "@type": "ListItem", position: 2, name: p.crumb, item: canonical }] };
     const page = { "@type": "WebPage", "@id": canonical, url: canonical, name: p.title, description: p.description, inLanguage: "en-IN", isPartOf: { "@id": `${url}/#website` }, publisher: { "@id": `${url}/#store` } };
     const others = CRAFT_PAGES.filter((c) => `/crafts/${c.slug}/` !== p.path).map((c) => `<a href="/crafts/${c.slug}/">${esc(c.name)}</a>`).join("");
     return `<!doctype html>
@@ -146,7 +146,7 @@ export function seo(env: Env): Plugin {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    ${common({ title: `${p.title} | ${brand.name}`, description: p.description, canonical, locale: "en_IN" }).join("\n    ")}
+    ${common({ title: `${p.title} | ${name}`, description: p.description, canonical, locale: "en_IN" }).join("\n    ")}
     ${ldJson([page, crumbs, store])}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -185,9 +185,9 @@ export function seo(env: Env): Plugin {
     </style>
   </head>
   <body>
-    <header><a class="home" href="/"><img src="/brand/${key === "authentic" ? "authentic-v3" : "v3"}/emblem-full.svg" alt="" />${esc(brand.name)}</a><nav><a href="/#bazaar">Shop</a></nav></header>
+    <header><a class="home" href="/"><img src="/brand/${key === "authentic" ? "authentic-v3" : "v3"}/emblem-full.svg" alt="" />${esc(name)}</a><nav><a href="/#bazaar">Shop</a></nav></header>
     <main>
-      <p class="crumb"><a href="/">${esc(brand.name)}</a> › ${esc(p.crumb)}</p>
+      <p class="crumb"><a href="/">${esc(name)}</a> › ${esc(p.crumb)}</p>
       ${p.body}
       <div class="ctas">
         <a class="btn gold" href="${wa(p.ask)}">Ask on WhatsApp</a>
@@ -209,7 +209,7 @@ export function seo(env: Env): Plugin {
       ${c.kinds ? `<h2>Kinds you can order</h2><ul>${c.kinds.map((k) => `<li>${esc(k)}</li>`).join("")}</ul>` : ""}
       <h2>How to tell it is real</h2>
       <ul class="marks">${c.marks.map(([h, t]) => `<li><strong>${esc(h)}</strong>${esc(t)}</li>`).join("")}</ul>
-      <h2>Buying from ${esc(brand.name)}</h2>
+      <h2>Buying from ${esc(name)}</h2>
       <p>Every piece we list names the ${esc(c.place)} family or collective that made it, and is sent to you by them. Tell us the colour, size, budget and date you need it by, and we will confirm the piece, price and making time before you pay. Registered GI: ${esc(c.gi)}.</p>`;
 
   const odopBody = () => `<h1>One District One Product (ODOP) crafts of Uttar Pradesh</h1>
